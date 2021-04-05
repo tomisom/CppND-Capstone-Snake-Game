@@ -10,7 +10,7 @@ GameElement::GameElement() :
     _actionColor(screenBackgroundColor),
     _solid(false),
     _visibility(Hidden),
-    _elementType(Unknown),
+    _elementType(UNKNOWN_TYPE),
     _vecActionColors(),
     _id(_debugId++),
     _actionThread(),
@@ -112,7 +112,7 @@ GameElement::GameElement(GameElement&& element) noexcept :
     _actionColor(screenBackgroundColor),
     _solid(false),
     _visibility(Hidden),
-    _elementType(Unknown),
+    _elementType(UNKNOWN_TYPE),
     _vecActionColors(),
     _id(DEFAULT_DEBUG_ID),
     _actionThread(),
@@ -137,7 +137,7 @@ GameElement::GameElement(GameElement&& element) noexcept :
     element._actionColor = screenBackgroundColor;
     element._solid = false;
     element._visibility = Hidden;
-    element._elementType = Unknown;
+    element._elementType = UNKNOWN_TYPE;
     element._vecActionColors.clear();
     _id = DEFAULT_DEBUG_ID;
 }
@@ -165,27 +165,66 @@ GameElement& GameElement::operator=(GameElement&& element) noexcept
         element._actionColor = screenBackgroundColor;
         element._solid = false;
         element._visibility = Hidden;
-        element._elementType = Unknown;
+        element._elementType = UNKNOWN_TYPE;
         element._vecActionColors.clear();
         _id = DEFAULT_DEBUG_ID;
     }
+}
 
+std::shared_ptr<GameElement> GameElement::CreateGameElement(ElementType type)
+{
+    switch(type) {
+        case GameElement::WALL:
+            return std::make_shared<Wall>();
+        case GameElement::POTION:
+            return std::make_shared<Potion>();
+        case GameElement::BOMB:
+            return std::make_shared<Bomb>();
+        case GameElement::SHRINK_PILL:
+            return std::make_shared<ShrinkPill>();
+        case GameElement::SLOW_PILL:
+            return std::make_shared<SlowPill>();
+        case GameElement::FOOD:
+            return std::make_shared<Food>();
+    }
+
+    return std::shared_ptr<GameElement>();
+}
+
+std::shared_ptr<GameElement> GameElement::CreateGameElement(ElementType type, int x, int y)
+{
+    switch(type) {
+        case GameElement::WALL:
+            return std::make_shared<Wall>(x, y);
+        case GameElement::POTION:
+            return std::make_shared<Potion>(x, y);
+        case GameElement::BOMB:
+            return std::make_shared<Bomb>(x, y);
+        case GameElement::SHRINK_PILL:
+            return std::make_shared<ShrinkPill>(x, y);
+        case GameElement::SLOW_PILL:
+            return std::make_shared<SlowPill>(x, y);
+        case GameElement::FOOD:
+            return std::make_shared<Food>(x, y);
+    }
+
+    return std::shared_ptr<GameElement>();
 }
 
 std::string GameElement::GetElementTypeString(ElementType type)
 {
     switch(type) {
-        case Potion:
+        case POTION:
             return "Potion";
-        case Bomb:
+        case BOMB:
             return "Bomb";
-        case ShrinkPill:
+        case SHRINK_PILL:
             return "Shrink Pill";
-        case SlowPill:
+        case SLOW_PILL:
             return "SlowPill";
-        case Wall:
+        case WALL:
             return "Wall";
-        case Food:
+        case FOOD:
             return "Food";
         default:
             return "Unknown";
@@ -314,39 +353,39 @@ void GameElement::UpdateColor()
 }
 
 /* class Food */
-Food::Food() : GameElement(foodColor, GameElement::Food) { SetInstantAppear(); }
+Food::Food() : GameElement(foodColor, GameElement::FOOD) { SetInstantAppear(); }
 
-Food::Food(int x, int y) : GameElement(x, y, foodColor, GameElement::Food) { SetInstantAppear(); }
+Food::Food(int x, int y) : GameElement(x, y, foodColor, GameElement::FOOD) { SetInstantAppear(); }
 
-Food::Food(SDL_Point location) : GameElement(location, foodColor, GameElement::Food) { SetInstantAppear(); }
+Food::Food(SDL_Point location) : GameElement(location, foodColor, GameElement::FOOD) { SetInstantAppear(); }
 
-Food::Food(Color color) : GameElement(color, ElementType::Food) { SetInstantAppear(); }
+Food::Food(Color color) : GameElement(color, ElementType::FOOD) { SetInstantAppear(); }
 
 Food::~Food() { }
 
 
 
 /* class Wall */
-Wall::Wall() : GameElement(wallColor, GameElement::Wall) { }
+Wall::Wall() : GameElement(wallColor, GameElement::WALL) { }
 
-Wall::Wall(int x, int y) : GameElement(x, y, wallColor, GameElement::Wall) { }
+Wall::Wall(int x, int y) : GameElement(x, y, wallColor, GameElement::WALL) { }
 
-Wall::Wall(SDL_Point location) : GameElement(location, wallColor, GameElement::Wall) { }
+Wall::Wall(SDL_Point location) : GameElement(location, wallColor, GameElement::WALL) { }
 
-Wall::Wall(Color color) : GameElement(color, ElementType::Wall) { }
+Wall::Wall(Color color) : GameElement(color, ElementType::WALL) { }
 
 Wall::~Wall() { }
 
 
 
 /* class Potion */
-Potion::Potion() : GameElement(potionColor, GameElement::Potion) { }
+Potion::Potion() : GameElement(potionColor, GameElement::POTION) { }
 
-Potion::Potion(int x, int y) : GameElement(x, y, potionColor, GameElement::Potion) { }
+Potion::Potion(int x, int y) : GameElement(x, y, potionColor, GameElement::POTION) { }
 
-Potion::Potion(SDL_Point location) : GameElement(location, potionColor, GameElement::Potion) { }
+Potion::Potion(SDL_Point location) : GameElement(location, potionColor, GameElement::POTION) { }
 
-Potion::Potion(Color color) : GameElement(color, ElementType::Potion) { }
+Potion::Potion(Color color) : GameElement(color, ElementType::POTION) { }
 
 Potion::~Potion() { }
 
@@ -364,13 +403,13 @@ void Potion::DrinkPotion()
 
 
 /* class Bomb */
-Bomb::Bomb() : GameElement(bombColor, GameElement::Bomb) { LoadActionColors(); }
+Bomb::Bomb() : GameElement(bombColor, GameElement::BOMB) { LoadActionColors(); }
 
-Bomb::Bomb(int x, int y) : GameElement(x, y, bombColor, GameElement::Bomb) { LoadActionColors(); }
+Bomb::Bomb(int x, int y) : GameElement(x, y, bombColor, GameElement::BOMB) { LoadActionColors(); }
 
-Bomb::Bomb(SDL_Point location) : GameElement(location, bombColor, GameElement::Bomb) { LoadActionColors(); }
+Bomb::Bomb(SDL_Point location) : GameElement(location, bombColor, GameElement::BOMB) { LoadActionColors(); }
 
-Bomb::Bomb(Color color) : GameElement(color, ElementType::Bomb) { LoadActionColors(); }
+Bomb::Bomb(Color color) : GameElement(color, ElementType::BOMB) { LoadActionColors(); }
 
 Bomb::~Bomb() { }
 
@@ -481,13 +520,13 @@ void Bomb::LightFuse()
 
 
 /* class ShrinkPill */
-ShrinkPill::ShrinkPill() : GameElement(shrinkPillColor, GameElement::ShrinkPill) { }
+ShrinkPill::ShrinkPill() : GameElement(shrinkPillColor, GameElement::SHRINK_PILL) { }
 
-ShrinkPill::ShrinkPill(int x, int y) : GameElement(x, y, shrinkPillColor, GameElement::ShrinkPill) { }
+ShrinkPill::ShrinkPill(int x, int y) : GameElement(x, y, shrinkPillColor, GameElement::SHRINK_PILL) { }
 
-ShrinkPill::ShrinkPill(SDL_Point location) : GameElement(location, shrinkPillColor, GameElement::ShrinkPill) { }
+ShrinkPill::ShrinkPill(SDL_Point location) : GameElement(location, shrinkPillColor, GameElement::SHRINK_PILL) { }
 
-ShrinkPill::ShrinkPill(Color color) : GameElement(color, ElementType::ShrinkPill) { }
+ShrinkPill::ShrinkPill(Color color) : GameElement(color, ElementType::SHRINK_PILL) { }
 
 ShrinkPill::~ShrinkPill() { }
 
@@ -504,13 +543,13 @@ void ShrinkPill::PopPill()
 
 
 /* class SlowPill */
-SlowPill::SlowPill() : GameElement(slowPillColor, GameElement::SlowPill) { }
+SlowPill::SlowPill() : GameElement(slowPillColor, GameElement::SLOW_PILL) { }
 
-SlowPill::SlowPill(int x, int y) : GameElement(x, y, slowPillColor, GameElement::SlowPill) { }
+SlowPill::SlowPill(int x, int y) : GameElement(x, y, slowPillColor, GameElement::SLOW_PILL) { }
 
-SlowPill::SlowPill(SDL_Point location) : GameElement(location, slowPillColor, GameElement::SlowPill) { }
+SlowPill::SlowPill(SDL_Point location) : GameElement(location, slowPillColor, GameElement::SLOW_PILL) { }
 
-SlowPill::SlowPill(Color color) : GameElement(color, ElementType::SlowPill) { }
+SlowPill::SlowPill(Color color) : GameElement(color, ElementType::SLOW_PILL) { }
 
 SlowPill::~SlowPill() { }
 

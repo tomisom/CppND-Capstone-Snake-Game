@@ -78,8 +78,8 @@ void Game::CreateWalls()
 
   for(int x = x_start; x < x_end; ++x) {
     if(x < ((x_grid_count/2) - x_half_gap_width) || x > ((x_grid_count/2) + x_half_gap_width)) {
-      std::shared_ptr<Wall> g1 = std::make_shared<Wall>(x, y_start);
-      std::shared_ptr<Wall> g2 = std::make_shared<Wall>(x, y_end);
+      std::shared_ptr<GameElement> g1 = GameElement::CreateGameElement(GameElement::WALL, x, y_start);
+      std::shared_ptr<GameElement> g2 = GameElement::CreateGameElement(GameElement::WALL, x, y_end);
       _elements.emplace_back(g1);
       _elements.emplace_back(g2);
       std::cout << "Wall " << g1->_id << ") placed at " << x << ", " << y_start << " (" << g1->GetLocation().x << ", " << g1->GetLocation().y << ")" << std::endl;
@@ -90,8 +90,8 @@ void Game::CreateWalls()
 
   for(int y = y_start; y < y_end; ++y) {
     if(y < ((y_grid_count/2) - y_half_gap_width) || y > ((y_grid_count/2) + y_half_gap_width)) {
-      std::shared_ptr<Wall> g1 = std::make_shared<Wall>(x_start, y);
-      std::shared_ptr<Wall> g2 = std::make_shared<Wall>(x_end, y);
+      std::shared_ptr<GameElement> g1 = GameElement::CreateGameElement(GameElement::WALL, x_start, y);
+      std::shared_ptr<GameElement> g2 = GameElement::CreateGameElement(GameElement::WALL, x_end, y);
       _elements.emplace_back(g1);
       _elements.emplace_back(g2);
       std::cout << "Wall " << g1->_id << ") placed at " << x_start << ", " << y << " (" << g1->GetLocation().x << ", " << g1->GetLocation().y << ")" << std::endl;
@@ -125,7 +125,7 @@ std::shared_ptr<Wall> Game::GetNextWall()
 std::shared_ptr<GameElement> Game::GetNextElement(GameElement::ElementType type)
 {
   for(auto &g : _elements) {
-    if(!g->IsWall() && g->IsHidden() && (g->GetType() == type) && g->IsAvailable()) { // the initial !wall check gets us through the beginning of the vector faster
+    if((g->GetType() == type) && g->IsHidden() && g->IsAvailable()) {
       return g;
     }
   }
@@ -167,39 +167,34 @@ void Game::PlaceNextWall()
 
 void Game::PlaceNextElement()
 {
+  std::cout << "PlaceNextElement" << std::endl;
+
   int choice = random_w(engine);
   int chance = random_h(engine);
 
   // only place something half the time
   if(chance % 2 == 0) return;
 
-  GameElement::ElementType eType = static_cast<GameElement::ElementType>(choice % GameElement::NumElementTypes);
+  GameElement::ElementType eType = static_cast<GameElement::ElementType>(choice % GameElement::NUM_ELEMENT_TYPES);
 
-  if(eType == GameElement::Wall) {
+  if(eType == GameElement::WALL) {
     PlaceNextWall();
   } else {
     std::shared_ptr<GameElement> pCurElement = GetNextElement(eType);
 
+    std::cout << "GetNextElement returned item " << pCurElement.get() << std::endl;
+
     if(!pCurElement) {
-      switch(eType) {
-        case GameElement::Potion:
-          pCurElement = std::make_shared<Potion>();
-          break;
-        case GameElement::Bomb:
-          pCurElement = std::make_shared<Bomb>();
-          pCurElement->SetUseCallbackFn(std::bind(&Game::ExplodeBomb, this, _1));
-          break;
-        case GameElement::ShrinkPill:
-          pCurElement = std::make_shared<ShrinkPill>();
-          break;
-        case GameElement::SlowPill:
-          pCurElement = std::make_shared<SlowPill>();
-          break;
-        default:
-          // leave the pointer null
-          break;
+      pCurElement = GameElement::CreateGameElement(eType);
+
+      // if this is a bomb, add the callback here
+      if(eType == GameElement::BOMB) {
+        pCurElement->SetUseCallbackFn(std::bind(&Game::ExplodeBomb, this, _1));
       }
-      _elements.emplace_back(pCurElement);
+
+      if(pCurElement) {
+        _elements.emplace_back(pCurElement);
+      }
     }
 
     if(pCurElement) {

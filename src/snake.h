@@ -46,10 +46,10 @@ class Snake {
   void AddSlowPill(std::shared_ptr<SlowPill> &pill);
 
   // element tests
-  bool HasPotion() { return (_items.at(GameElement::Potion).size() > 0); }
-  bool HasBomb() { return (_items.at(GameElement::Bomb).size() > 0); }
-  bool HasShrinkPill() { return (_items.at(GameElement::ShrinkPill).size() > 0); }
-  bool HasSlowPill() { return (_items.at(GameElement::SlowPill).size() > 0); }
+  bool HasPotion() { return (_items.at(GameElement::POTION).size() > 0); }
+  bool HasBomb() { return (_items.at(GameElement::BOMB).size() > 0); }
+  bool HasShrinkPill() { return (_items.at(GameElement::SHRINK_PILL).size() > 0); }
+  bool HasSlowPill() { return (_items.at(GameElement::SLOW_PILL).size() > 0); }
 
   // use element functions
   void UsePotion();
@@ -58,10 +58,10 @@ class Snake {
   void UseSlowPill();
 
   // element count functions
-  int  PotionCount() const { return _items.at(GameElement::Potion).size(); }
-  int  BombCount() const { return _items.at(GameElement::Bomb).size(); }
-  int  ShrinkPillCount() const { return _items.at(GameElement::ShrinkPill).size(); }
-  int  SlowPillCount() const { return _items.at(GameElement::SlowPill).size(); }
+  int  PotionCount() const { return _items.at(GameElement::POTION).size(); }
+  int  BombCount() const { return _items.at(GameElement::BOMB).size(); }
+  int  ShrinkPillCount() const { return _items.at(GameElement::SHRINK_PILL).size(); }
+  int  SlowPillCount() const { return _items.at(GameElement::SLOW_PILL).size(); }
   int  GetSize() const
   {
     if(_pData) return _pData->size;

@@ -9,7 +9,7 @@ Snake::Snake(int grid_width, int grid_height)
         head_x(grid_width / 2),
         head_y(grid_height / 2),
         head_color(liveSnakeHeadColor), body_color(liveSnakeBodyColor),
-        _items(GameElement::NumElementTypes-1, std::vector<std::shared_ptr<GameElement>>()),
+        _items(GameElement::NUM_ELEMENT_TYPES-1, std::vector<std::shared_ptr<GameElement>>()),
         _pData(new SnakeData())
 {
 }
@@ -168,16 +168,16 @@ void Snake::UseElement(GameElement::ElementType type)
     auto &e = _items.at(type).front();
 
     // don't make potions or pills visible, they just get used
-    if(type == GameElement::Potion) {
+    if(type == GameElement::POTION) {
       _abilityActive = true;
       std::cout << "Potion used" << std::endl;
-    } else if(type == GameElement::ShrinkPill) {
+    } else if(type == GameElement::SHRINK_PILL) {
       _abilityActive = true;
       std::cout << "Shrink Pill used" << std::endl;
-    } else if(type == GameElement::SlowPill) {
+    } else if(type == GameElement::SLOW_PILL) {
       _abilityActive = true;
       std::cout << "Slow Pill used" << std::endl;
-    } else if(type == GameElement::Bomb) {
+    } else if(type == GameElement::BOMB) {
       e->SetLocation(head_x, head_y);
       std::cout << GameElement::GetElementTypeString(type) << " (" << e->_id << ") placed at " << (int)head_x << ", " << (int)head_y << std::endl;
     }
@@ -195,7 +195,7 @@ void Snake::AddPotion(std::shared_ptr<Potion> &potion)
   potion->Hide();
   potion->SetUnavailable();
   potion->SetUseCallbackFn(std::bind(&Snake::MakeInvincible, this));
-  _items.at(GameElement::Potion).emplace_back(potion);
+  _items.at(GameElement::POTION).emplace_back(potion);
   std::cout << potion->GetElementTypeString() << " (" << potion->_id << ") picked up from " << (int)head_x << ", " << (int)head_y << std::endl;
 }
 
@@ -204,7 +204,7 @@ void Snake::AddBomb(std::shared_ptr<Bomb> &bomb)
   bomb->Hide();
   bomb->SetUnavailable();
   // callback was set in Game
-  _items.at(GameElement::Bomb).emplace_back(bomb);
+  _items.at(GameElement::BOMB).emplace_back(bomb);
   std::cout << bomb->GetElementTypeString() << " (" << bomb->_id << ") picked up from " << (int)head_x << ", " << (int)head_y << std::endl;
 }
 
@@ -213,7 +213,7 @@ void Snake::AddShrinkPill(std::shared_ptr<ShrinkPill> &pill)
   pill->Hide();
   pill->SetUnavailable();
   pill->SetUseCallbackFn(std::bind(&Snake::ShrinkBody, this));
-  _items.at(GameElement::ShrinkPill).emplace_back(pill);
+  _items.at(GameElement::SHRINK_PILL).emplace_back(pill);
   std::cout << pill->GetElementTypeString() << " (" << pill->_id << ") picked up from " << (int)head_x << ", " << (int)head_y << std::endl;
 }
 
@@ -222,28 +222,28 @@ void Snake::AddSlowPill(std::shared_ptr<SlowPill> &pill)
   pill->Hide();
   pill->SetUnavailable();
   pill->SetUseCallbackFn(std::bind(&Snake::SlowSnake, this));
-  _items.at(GameElement::SlowPill).emplace_back(pill);
+  _items.at(GameElement::SLOW_PILL).emplace_back(pill);
   std::cout << pill->GetElementTypeString() << " (" << pill->_id << ") picked up from " << (int)head_x << ", " << (int)head_y << std::endl;
 }
 
 void Snake::UsePotion()
 {
-  UseElement(GameElement::Potion);
+  UseElement(GameElement::POTION);
 }
 
 void Snake::UseBomb()
 {
-  UseElement(GameElement::Bomb);
+  UseElement(GameElement::BOMB);
 }
 
 void Snake::UseShrinkPill()
 {
-  UseElement(GameElement::ShrinkPill);
+  UseElement(GameElement::SHRINK_PILL);
 }
 
 void Snake::UseSlowPill()
 {
-  UseElement(GameElement::SlowPill);
+  UseElement(GameElement::SLOW_PILL);
 }
 
 void Snake::UpdateData()

@@ -27,14 +27,14 @@ public:
     };
 
     typedef enum ELEMENT_TYPE {
-        Potion,
-        Bomb,
-        ShrinkPill,
-        SlowPill,
-        Wall,
-        NumElementTypes,
-        Unknown,
-        Food // this is a special type
+        POTION,
+        BOMB,
+        SHRINK_PILL,
+        SLOW_PILL,
+        WALL,
+        NUM_ELEMENT_TYPES,
+        UNKNOWN_TYPE,
+        FOOD // this is a special type
     } ElementType;
 
     static int _debugId;    // will be incremented with each object and used to populate _id, unless copied, then will use default val
@@ -55,6 +55,10 @@ public:
     GameElement(GameElement&& element) noexcept;
     GameElement& operator=(GameElement&& element) noexcept;
 
+    // Factory methods
+    static std::shared_ptr<GameElement> CreateGameElement(ElementType type);
+    static std::shared_ptr<GameElement> CreateGameElement(ElementType type, int x, int y);
+
     std::string GetElementTypeString();
     static std::string GetElementTypeString(ElementType type);
     
@@ -69,11 +73,11 @@ public:
     bool IsAvailable() { return _available; }
     
     ElementType GetType() { return _elementType; }
-    bool IsWall() { return (_elementType == Wall); }
-    bool IsPotion() { return (_elementType == Potion); }
-    bool IsBomb() { return (_elementType == Bomb); }
-    bool IsShrinkPill() { return (_elementType == ShrinkPill); }
-    bool IsSlowPill() { return (_elementType == SlowPill); }
+    bool IsWall() { return (_elementType == WALL); }
+    bool IsPotion() { return (_elementType == POTION); }
+    bool IsBomb() { return (_elementType == BOMB); }
+    bool IsShrinkPill() { return (_elementType == SHRINK_PILL); }
+    bool IsSlowPill() { return (_elementType == SLOW_PILL); }
 
     void SetColor(Color c);
     void SetColor(int r, int g, int b, int a);
